@@ -4,8 +4,9 @@ Configuration management for Blog Brain using Pydantic Settings.
 This module handles all environment variables and application settings.
 """
 
-from pydantic_settings import BaseSettings
-from typing import List
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
+from typing import List, Union
 
 
 class Settings(BaseSettings):
@@ -25,8 +26,8 @@ class Settings(BaseSettings):
     api_port: int = 8000
     api_reload: bool = True
     
-    # CORS Settings
-    allowed_origins: List[str] = ["http://localhost:3000"]
+    # CORS Settings (can be comma-separated string or list)
+    allowed_origins: Union[List[str], str] = ["http://localhost:3000"]
     
     # Logging
     log_level: str = "INFO"
@@ -42,18 +43,21 @@ class Settings(BaseSettings):
     enable_delegation: bool = True       # Agents can delegate tasks
     max_iterations: int = 3              # Max task iterations
     
-    class Config:
-        """Pydantic configuration"""
-        env_file = ".env"
-        case_sensitive = False
-        
-        # Allow parsing comma-separated values for lists
-        @classmethod
-        def parse_env_var(cls, field_name: str, raw_val: str):
-            if field_name == 'allowed_origins':
-                return [x.strip() for x in raw_val.split(',')]
-            return raw_val
+    @field_validator('allowed_origins', mode='before')
+    @classmethod
+    def parse_origins(cls, v):
+        """Parse comma-separated string into list"""
+        if isinstance(v, str):
+            return [x.strip() for x in v.split(',')]
+        return v
+    
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra='ignore'
+    )
 
 
 # Global settings instance
 settings = Settings()
+

@@ -4,7 +4,7 @@ Web scraping tools for Blog Brain.
 Provides functionality to scrape and extract content from web pages.
 """
 
-from crewai_tools import tool
+from crewai.tools import tool
 from bs4 import BeautifulSoup
 import requests
 from typing import Dict, Optional, List

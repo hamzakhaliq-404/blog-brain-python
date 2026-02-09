@@ -4,7 +4,7 @@ Search tools for Blog Brain using Serper.dev API.
 Provides Google search functionality for the research agent.
 """
 
-from crewai_tools import tool
+from crewai.tools import tool
 import requests
 from config import settings
 from utils.logger import setup_logger
