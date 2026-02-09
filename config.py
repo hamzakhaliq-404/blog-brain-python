@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     
     # API Keys
     gemini_api_key: str
-    gemini_model: str = "gemini-1.5-pro"
+    gemini_model: str = "gemini-3-pro-preview"
     serper_api_key: str
     
     # API Configuration
