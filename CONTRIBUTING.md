@@ -26,7 +26,7 @@ Thank you for your interest in contributing to Blog Brain! This document provide
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/yourusername/blog-brain-python
+git clone https://github.com/hamzakhaliq-404/blog-brain-python.git
 cd blog-brain-python
 
 # 2. Create virtual environment

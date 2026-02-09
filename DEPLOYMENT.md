@@ -42,7 +42,7 @@ Complete guide for deploying Blog Brain to production.
 
 ```bash
 # Clone repository
-git clone <your-repo-url>
+git clone https://github.com/hamzakhaliq-404/blog-brain-python.git
 cd blog-brain-python
 
 # Create virtual environment

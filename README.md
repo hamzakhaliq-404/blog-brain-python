@@ -1,6 +1,15 @@
 # Blog Brain - AI Content Generation System
 
-An autonomous multi-agent system that generates SEO-optimized, publication-ready blog posts using CrewAI and Google Gemini 1.5 Pro.
+[![GitHub](https://img.shields.io/badge/GitHub-blog--brain--python-blue?logo=github)](https://github.com/hamzakhaliq-404/blog-brain-python)
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue?logo=python)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.108%2B-green?logo=fastapi)](https://fastapi.tiangolo.com/)
+[![CrewAI](https://img.shields.io/badge/CrewAI-Multi--Agent-orange)](https://www.crewai.com/)
+
+An autonomous multi-agent system that generates SEO-optimized, publication-ready blog posts using CrewAI and Google Gemini.
+
+## 🔗 Repository
+
+**GitHub**: [github.com/hamzakhaliq-404/blog-brain-python](https://github.com/hamzakhaliq-404/blog-brain-python)
 
 ## Overview
 
@@ -31,7 +40,11 @@ Blog Brain is a headless Python backend that functions as an autonomous editoria
 
 ### Installation
 
-1. **Clone or navigate to the project directory**
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/hamzakhaliq-404/blog-brain-python.git
+   cd blog-brain-python
+   ```
 
 2. **Install dependencies**
    ```bash
