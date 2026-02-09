@@ -181,8 +181,8 @@ class ContentGenerationCrew:
         """
         Parse the crew output into a standardized format.
         
-        The editor agent should return a JSON object, but we handle
-        both JSON and string outputs gracefully.
+        The editor agent returns JSON wrapped in markdown code blocks.
+        We need to extract and parse this JSON properly.
         
         Args:
             result: Output from crew.kickoff()
@@ -191,40 +191,92 @@ class ContentGenerationCrew:
             Standardized dictionary with content and metadata
         """
         
-        # If result is already a dict, return it
-        if isinstance(result, dict):
-            self.logger.info("✓ Output is already in JSON format")
-            return result
+        self.logger.info("Parsing crew output...")
         
-        # If result is a string, try to parse as JSON
-        if isinstance(result, str):
-            self.logger.info("Parsing string output...")
-            
-            try:
-                output = json.loads(result)
-                self.logger.info("✓ Successfully parsed JSON from string")
-                return output
-            except json.JSONDecodeError:
-                self.logger.warning("⚠️  Output is not valid JSON, wrapping in standard format")
-                # Wrap raw text in a basic structure
+        # CrewAI returns a result object with raw string output
+        raw_output = str(result)
+        
+        self.logger.info(f"Raw output type: {type(result)}")
+        
+        try:
+            # The editor returns JSON wrapped in ```json code blocks
+            # Extract JSON from code blocks
+            if "```json" in raw_output:
+                self.logger.info("Extracting JSON from code block...")
+                start_idx = raw_output.find("```json") + 7
+                end_idx = raw_output.find("```", start_idx)
+                json_str = raw_output[start_idx:end_idx].strip()
+                
+                # Parse the JSON
+                parsed_data = json.loads(json_str)
+                self.logger.info("✓ Successfully extracted and parsed JSON from code block")
+                
+                # The editor returns the data directly, wrap it in success response
                 return {
                     "status": "success",
                     "data": {
-                        "content": {
-                            "markdown_body": result
-                        }
-                    },
-                    "note": "Output was plain text, not structured JSON"
+                        "metadata": parsed_data.get("metadata", {}),
+                        "content": parsed_data.get("content", {}),
+                        "sources": parsed_data.get("sources", []),
+                        "quality_checks": parsed_data.get("quality_checks"),
+                        "editor_notes": parsed_data.get("editor_notes")
+                    }
                 }
-        
-        # Fallback for other types
-        self.logger.warning(f"⚠️  Unexpected output type: {type(result)}")
-        return {
-            "status": "success",
-            "data": {
-                "raw_output": str(result)
+            
+            # Try parsing as direct JSON
+            try:
+                parsed_data = json.loads(raw_output)
+                self.logger.info("✓ Successfully parsed direct JSON")
+                
+                # Check if it's already in the correct format
+                if "status" in parsed_data and "data" in parsed_data:
+                    return parsed_data
+                
+                # Wrap it in success response
+                return {
+                    "status": "success",
+                    "data": {
+                        "metadata": parsed_data.get("metadata", {}),
+                        "content": parsed_data.get("content", {}),
+                        "sources": parsed_data.get("sources", []),
+                        "quality_checks": parsed_data.get("quality_checks"),
+                        "editor_notes": parsed_data.get("editor_notes")
+                    }
+                }
+                
+            except json.JSONDecodeError:
+                self.logger.warning("⚠️  Could not parse as JSON, treating as plain text")
+                
+                # Fallback: wrap raw text
+                return {
+                    "status": "success",
+                    "data": {
+                        "metadata": {
+                            "seo_title": "Generated Content",
+                            "meta_description": "AI-generated content",
+                            "slug": "generated-content",
+                            "focus_keyword": "content",
+                            "estimated_read_time": "5 mins",
+                            "word_count": len(raw_output.split())
+                        },
+                        "content": {
+                            "markdown_body": raw_output,
+                            "html_body": f"<p>{raw_output}</p>"
+                        },
+                        "sources": []
+                    }
+                }
+                
+        except Exception as e:
+            self.logger.error(f"❌ Error parsing output: {str(e)}")
+            return {
+                "status": "error",
+                "message": f"Failed to parse editor output: {str(e)}",
+                "data": {
+                    "raw_output": raw_output
+                }
             }
-        }
+
     
     def validate_output(self, output: Dict[str, Any]) -> bool:
         """
