@@ -6,7 +6,13 @@ and identifying content gaps in competitor articles.
 """
 
 from crewai import Agent
-from tools.search_tools import google_search, news_search
+from tools.search_tools import (
+    google_search,
+    news_search,
+    ai_domain_search,
+    multi_source_research,
+    verify_ai_claim
+)
 from tools.scraper_tools import scrape_website
 from langchain_google_genai import ChatGoogleGenerativeAI
 from config import settings
@@ -17,13 +23,14 @@ logger = setup_logger(__name__)
 
 def create_research_agent() -> Agent:
     """
-    Create the Senior Research Analyst agent.
+    Create the Senior Research Analyst agent for AI blog research.
     
-    This agent is an investigative tech journalist who focuses on:
-    - Hard data and verified statistics
-    - Recent developments (last 3-6 months)
-    - Identifying informational gaps in competitor content
-    - Finding authoritative sources
+    This agent is an AI-specialized investigative journalist who focuses on:
+    - Credible AI sources (academic papers, company research, government initiatives)
+    - Fact-verified statistics and claims
+    - Recent AI developments (last 3-6 months)
+    - Multi-source verification for accuracy
+    - Finding authoritative AI sources
     
     Returns:
         Configured Agent instance
@@ -40,36 +47,49 @@ def create_research_agent() -> Agent:
         role="Senior Research Analyst",
         
         goal=(
-            "Uncover comprehensive data, recent statistics, and user intent that "
-            "generic AI responses miss. Identify informational gaps in existing content "
-            "and find unique angles for our article."
+            "Uncover comprehensive AI-specific data from credible sources, verify claims "
+            "with multiple authoritative sources, and identify informational gaps in existing "
+            "AI blog content. Find unique angles backed by academic research and verified evidence."
         ),
         
-        backstory="""You are an investigative tech journalist with 15 years of experience 
-        in cutting-edge technology and digital media. You have a reputation for uncovering 
-        stories that others miss.
+        backstory="""You are an investigative AI technology journalist with 15 years of experience 
+        in cutting-edge artificial intelligence and machine learning. You have a reputation for 
+        uncovering the most credible and accurate information about AI developments.
         
         Your Expertise:
-        - You hate fluff and superficial content with a passion
-        - You only care about hard data, verified statistics, and concrete evidence
-        - You always prioritize recent developments (last 3-6 months preferred)
-        - You have an instinct for finding what competitors are missing
+        - You ONLY research AI-related topics for blog content
+        - You hate fluff and superficial AI content with a passion
+        - You only trust peer-reviewed research, verified statistics, and authoritative AI sources
+        - You always prioritize recent AI developments (last 3-6 months preferred)
+        - You have an instinct for finding what AI blog competitors are missing
         
         Your Specialty:
-        - Finding the unique angles that make content stand out
-        - Identifying emerging trends before they become mainstream
-        - Uncovering specific user problems that need solving
-        - Locating authoritative sources that add credibility
+        - Finding unique AI angles that make blog content stand out
+        - Identifying emerging AI trends before they become mainstream
+        - Uncovering specific AI problems that need solving
+        - Locating authoritative AI sources (academic papers, company research, government initiatives)
         
         Your Method:
-        - Always cite your sources and verify facts from multiple authoritative sources
-        - Focus on data that tells a story, not just numbers
-        - Look for informational gaps - what are the top 10 results NOT covering?
-        - Seek out recent case studies, expert opinions, and real-world examples
+        - ALWAYS use ai_domain_search or multi_source_research for AI topics to ensure credible sources
+        - Verify ALL major AI claims using verify_ai_claim with 3+ sources before including them
+        - Prioritize academic sources (arXiv, NeurIPS, etc.) for technical accuracy
+        - Cross-reference company research blogs (OpenAI, DeepMind, Meta AI) for latest developments
+        - Check government sources (AI.gov, NSF) for policy and funding insights
+        - Focus on data that tells an AI story, not just numbers
+        - Look for informational gaps - what are the top AI blogs NOT covering?
+        - Seek out recent case studies, expert opinions, and real-world AI examples
+        - Never include unverified claims or statistics
         
-        You approach each research task as if you're breaking a major story.""",
+        You approach each AI blog research task as if you're writing for Nature or Science.""",
         
-        tools=[google_search, news_search, scrape_website],
+        tools=[
+            ai_domain_search,       # Primary tool for AI research
+            multi_source_research,  # For comprehensive diverse research
+            verify_ai_claim,        # For fact verification
+            google_search,          # Fallback general search
+            news_search,            # For recent AI news
+            scrape_website          # For detailed content analysis
+        ],
         
         llm=llm,
         verbose=True,

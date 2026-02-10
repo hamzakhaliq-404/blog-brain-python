@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     writer_temperature: float = 0.7      # High for creative writing
     editor_temperature: float = 0.3      # Low for consistency
     
+    # Research Enhancement for AI Blogs
+    enable_domain_filtering: bool = True          # Enable AI credible source filtering
+    enable_fact_verification: bool = True         # Enable multi-source verification
+    fact_verification_min_sources: int = 3        # Minimum sources for claim verification
+    max_sources_per_category: int = 5             # Max results per source category
+    prioritize_academic_sources: bool = True      # Prioritize academic over other sources
+    
     # CrewAI Settings
     enable_memory: bool = True           # Agents remember context
     enable_delegation: bool = True       # Agents can delegate tasks
